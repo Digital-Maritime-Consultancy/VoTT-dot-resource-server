@@ -1,8 +1,7 @@
-package org.dmc.imgmockserver.controller;
+package org.dmc.vottdotserver.controller;
 
-import org.dmc.imgmockserver.model.Metadata;
-import org.dmc.imgmockserver.repository.MetadataRepository;
-import org.json.JSONObject;
+import org.dmc.vottdotserver.model.Project;
+import org.dmc.vottdotserver.repository.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,52 +18,54 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.json.JSONObject;
+
 @RestController
-@RequestMapping("/metadata")
-public class MetadataController {
+@RequestMapping("/projects")
+public class ProjectController {
     @Autowired
-    MetadataRepository metadataRepository;
+    ProjectRepository projectRepository;
 
     @GetMapping("")
-    public ResponseEntity<List<Metadata>> getAllMetadatas() {
+    public ResponseEntity<List<Project>> getAllProjects() {
         try {
-            List<Metadata> metadata = new ArrayList<Metadata>();
+            List<Project> projects = new ArrayList<Project>();
 
-            metadataRepository.findAll().forEach(metadata::add);
+            projectRepository.findAll().forEach(projects::add);
 
-            if (metadata.isEmpty()) {
+            if (projects.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
 
-            return new ResponseEntity<>(metadata, HttpStatus.OK);
+            return new ResponseEntity<>(projects, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<String> getMetadataById(@PathVariable("id") String id) {
-        Optional<Metadata> metadatum = metadataRepository.findByAssetId(id);
+    public ResponseEntity<String> getProjectById(@PathVariable("id") String id) {
+        Optional<Project> projectData = projectRepository.findByProjectId(id);
 
-        if (metadatum.isPresent()) {
-            return new ResponseEntity<>(metadatum.get().getData(), HttpStatus.OK);
+        if (projectData.isPresent()) {
+            return new ResponseEntity<>(projectData.get().getData(), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
     @PostMapping("")
-    public ResponseEntity<Metadata> createMetadata(@RequestBody String jsonBody) {
+    public ResponseEntity<Project> createProject(@RequestBody String jsonBody) {
         try {
             final JSONObject obj = new JSONObject(jsonBody);
-            final String metadatumId = obj.getJSONObject("asset").getString("id");
-            if (metadatumId.length() == 0) {
+            final String projectId = obj.getString("id");
+            if (projectId.length() == 0) {
                 return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
             }
             try {
-                Metadata _metadatum = metadataRepository
-                        .save(new Metadata(metadatumId, jsonBody));
-                return new ResponseEntity<>(_metadatum, HttpStatus.CREATED);
+                Project _project = projectRepository
+                        .save(new Project(projectId, jsonBody));
+                return new ResponseEntity<>(_project, HttpStatus.CREATED);
             } catch (Exception e) {
                 return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -74,33 +75,33 @@ public class MetadataController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, produces = "application/json")
-    public ResponseEntity<String> updateMetadata(@PathVariable("id") String id, @RequestBody String jsonBody) {
-        Optional<Metadata> metadatum = metadataRepository.findByAssetId(id);
+    public ResponseEntity<String> updateProject(@PathVariable("id") String id, @RequestBody String jsonBody) {
+        Optional<Project> projectData = projectRepository.findByProjectId(id);
 
-        if (metadatum.isPresent()) {
-            Metadata _metadatum = metadatum.get();
+        if (projectData.isPresent()) {
+            Project _project = projectData.get();
 
-            // check the submitted data contains identical asset id
+            // check the submitted data contains identical project id
             final JSONObject obj = new JSONObject(jsonBody);
-            final String metadatumId = obj.getJSONObject("asset").getString("id");
-            if (!metadatumId.equals(_metadatum.getAssetId())) {
+            final String projectId = obj.getString("id");
+            if (!projectId.equals(_project.getProjectId())) {
                 return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
             }
-            _metadatum.setData(jsonBody);
-            return new ResponseEntity<>(metadataRepository.save(_metadatum).getData(), HttpStatus.ACCEPTED);
+            _project.setData(jsonBody);
+            return new ResponseEntity<>(projectRepository.save(_project).getData(), HttpStatus.ACCEPTED);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteMetadata(@PathVariable("id") String id) {
+    public ResponseEntity<HttpStatus> deleteProject(@PathVariable("id") String id) {
         try {
-            Optional<Metadata> metadatum = metadataRepository.findByAssetId(id);
+            Optional<Project> projectData = projectRepository.findByProjectId(id);
 
-            if (metadatum.isPresent()) {
-                Metadata _metadatum = metadatum.get();
-                metadataRepository.deleteById(_metadatum.getUuid());
+            if (projectData.isPresent()) {
+                Project _project = projectData.get();
+                projectRepository.deleteById(_project.getUuid());
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
             else {

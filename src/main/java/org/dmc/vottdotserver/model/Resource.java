@@ -1,4 +1,4 @@
-package org.dmc.imgmockserver.model;
+package org.dmc.vottdotserver.model;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import org.hibernate.annotations.Type;

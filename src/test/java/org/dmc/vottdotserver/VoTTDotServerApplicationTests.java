@@ -1,10 +1,10 @@
-package org.dmc.imgmockserver;
+package org.dmc.vottdotserver;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ImgMockServerApplicationTests {
+class VoTTDotServerApplicationTests {
 
     @Test
     void contextLoads() {

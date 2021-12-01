@@ -1,4 +1,4 @@
-package org.dmc.imgmockserver.model;
+package org.dmc.vottdotserver.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +14,7 @@ import javax.persistence.FetchType;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Project extends Resource{
+public class Metadata extends Resource{
 
     public String getData() {
         return data;
@@ -24,15 +24,15 @@ public class Project extends Resource{
         this.data = data;
     }
 
-    public String getProjectId() {
-        return projectId;
+    public String getAssetId() {
+        return assetId;
     }
 
-    public void setProjectId(String projectId) {
-        this.projectId = projectId;
+    public void setAssetId(String metadataId) {
+        this.assetId = metadataId;
     }
 
-    private String projectId;
+    private String assetId;
 
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")

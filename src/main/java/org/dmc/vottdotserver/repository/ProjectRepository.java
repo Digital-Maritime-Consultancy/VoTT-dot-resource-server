@@ -1,6 +1,6 @@
-package org.dmc.imgmockserver.repository;
+package org.dmc.vottdotserver.repository;
 
-import org.dmc.imgmockserver.model.Project;
+import org.dmc.vottdotserver.model.Project;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
