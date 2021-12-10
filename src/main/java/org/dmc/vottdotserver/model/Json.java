@@ -14,7 +14,7 @@ import javax.persistence.FetchType;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Project extends Resource{
+public class Json extends Resource{
 
     public String getData() {
         return data;
@@ -24,15 +24,15 @@ public class Project extends Resource{
         this.data = data;
     }
 
-    public String getProjectId() {
-        return projectId;
+    public String getFileName() {
+        return fileName;
     }
 
-    public void setProjectId(String projectId) {
-        this.projectId = projectId;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
-    private String projectId;
+    private String fileName;
 
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")
