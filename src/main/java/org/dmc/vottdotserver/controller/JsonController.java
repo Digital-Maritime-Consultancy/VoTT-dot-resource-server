@@ -76,7 +76,6 @@ public class JsonController {
     public ResponseEntity<String> updateMetadata(@PathVariable("fileName") String fileName, @RequestBody String jsonBody) {
         Optional<Json> metadatum = jsonRepository.findByFileName(fileName);
 
-        System.out.println(jsonBody);
         if (jsonBody.isEmpty()) {
             return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
         }
