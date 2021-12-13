@@ -48,7 +48,7 @@ public class JsonController {
         if (metadatum.isPresent()) {
             return new ResponseEntity<>(metadatum.get().getData(), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("", HttpStatus.NO_CONTENT);
         }
     }
 
