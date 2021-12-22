@@ -10,6 +10,4 @@ import java.util.UUID;
 @Repository
 public interface FileRepository extends JpaRepository<File, UUID> {
     Optional<File> findByFileName(String fileName);
-    Optional<File> findByTaskId(String taskId);
-    Optional<File> findByFileNameAndTaskId(String fileName, String taskId);
 }

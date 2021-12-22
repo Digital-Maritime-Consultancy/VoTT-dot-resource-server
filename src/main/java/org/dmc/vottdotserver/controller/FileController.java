@@ -46,20 +46,24 @@ public class FileController {
         }
     }
 
+    private String getFileId(String fileName, String id) {
+        return fileName + "_" + id;
+    }
+
     @RequestMapping(value = "/{fileName}", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<String> getMetadataById(@PathVariable("fileName") String fileName, @Valid @NotBlank @RequestParam("uuid") String id) {
-        Optional<File> metadatum = fileRepository.findByFileNameAndTaskId(fileName, id);
+        Optional<File> metadatum = fileRepository.findByFileName(getFileId(fileName, id));
 
         if (metadatum.isPresent()) {
             return new ResponseEntity<>(metadatum.get().getData(), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("", HttpStatus.NO_CONTENT);
         }
     }
 
     @RequestMapping(value = "/{fileName}", method = RequestMethod.PUT, produces = "application/json")
     public ResponseEntity<String> updateMetadata(@PathVariable("fileName") String fileName, @Valid @NotBlank @RequestParam("uuid") String id, @RequestBody String jsonBody) {
-        Optional<File> metadatum = fileRepository.findByFileNameAndTaskId(fileName, id);
+        Optional<File> metadatum = fileRepository.findByFileName(getFileId(fileName, id));
 
         if (jsonBody.isEmpty()) {
             return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
@@ -69,14 +73,14 @@ public class FileController {
             _metadatum.setData(jsonBody);
             return new ResponseEntity<>(fileRepository.save(_metadatum).getData(), HttpStatus.ACCEPTED);
         } else {
-            return new ResponseEntity<>(fileRepository.save(new File(fileName, id, jsonBody)).getData(), HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(fileRepository.save(new File(getFileId(fileName, id), jsonBody)).getData(), HttpStatus.ACCEPTED);
         }
     }
 
     @DeleteMapping("/{fileName}")
     public ResponseEntity<HttpStatus> deleteMetadata(@PathVariable("fileName") String fileName, @Valid @NotBlank @RequestParam("uuid") String id) {
         try {
-            Optional<File> metadatum = fileRepository.findByFileNameAndTaskId(fileName, id);
+            Optional<File> metadatum = fileRepository.findByFileName(getFileId(fileName, id));
 
             if (metadatum.isPresent()) {
                 File _metadatum = metadatum.get();
