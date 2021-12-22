@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/tasks")
+@RequestMapping("/task")
 public class TaskController {
     @Autowired
     TaskRepository taskRepository;
@@ -41,8 +42,8 @@ public class TaskController {
         }
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<String> getTaskById(@PathVariable("id") String id) {
+    @RequestMapping(value = "", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<String> getTaskById(@RequestParam("uuid") String id) {
         Optional<Task> metadatum = taskRepository.findById(id);
 
         if (metadatum.isPresent()) {
@@ -73,8 +74,8 @@ public class TaskController {
         }
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT, produces = "application/json")
-    public ResponseEntity<String> updateTask(@PathVariable("id") String id, @RequestBody String TaskBody) {
+    @RequestMapping(value = "", method = RequestMethod.PUT, produces = "application/json")
+    public ResponseEntity<String> updateTask(@RequestParam("uuid") String id, @RequestBody String TaskBody) {
         Optional<Task> metadatum = taskRepository.findById(id);
 
         if (TaskBody.isEmpty()) {
@@ -89,8 +90,8 @@ public class TaskController {
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteTask(@PathVariable("id") String id) {
+    @DeleteMapping("")
+    public ResponseEntity<HttpStatus> deleteTask(@RequestParam("uuid") String id) {
         try {
             Optional<Task> metadatum = taskRepository.findById(id);
 

@@ -18,10 +18,11 @@ import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/images")
+@RequestMapping("/image")
 public class ImageController {
 
     @Value("classpath:jsons/data.json")
@@ -38,7 +39,6 @@ public class ImageController {
 
     @RequestMapping(value = "/{fileName}", method = RequestMethod.GET,
             produces = MediaType.IMAGE_JPEG_VALUE)
-
     public void getImage(HttpServletResponse response, @PathVariable("fileName") String fileName) throws IOException {
 
         var imgFile = new ClassPathResource("images/"+fileName);
