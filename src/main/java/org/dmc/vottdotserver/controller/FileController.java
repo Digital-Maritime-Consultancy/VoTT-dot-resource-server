@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,12 +15,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
+@Validated
 @RequestMapping("/file")
 public class FileController {
     @Autowired
@@ -43,7 +47,7 @@ public class FileController {
     }
 
     @RequestMapping(value = "/{fileName}", method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<String> getMetadataById(@PathVariable("fileName") String fileName, @RequestParam("uuid") String id) {
+    public ResponseEntity<String> getMetadataById(@PathVariable("fileName") String fileName, @Valid @NotBlank @RequestParam("uuid") String id) {
         Optional<File> metadatum = fileRepository.findByFileNameAndTaskId(fileName, id);
 
         if (metadatum.isPresent()) {
@@ -54,7 +58,7 @@ public class FileController {
     }
 
     @RequestMapping(value = "/{fileName}", method = RequestMethod.PUT, produces = "application/json")
-    public ResponseEntity<String> updateMetadata(@PathVariable("fileName") String fileName, @RequestParam("uuid") String id, @RequestBody String jsonBody) {
+    public ResponseEntity<String> updateMetadata(@PathVariable("fileName") String fileName, @Valid @NotBlank @RequestParam("uuid") String id, @RequestBody String jsonBody) {
         Optional<File> metadatum = fileRepository.findByFileNameAndTaskId(fileName, id);
 
         if (jsonBody.isEmpty()) {
@@ -70,7 +74,7 @@ public class FileController {
     }
 
     @DeleteMapping("/{fileName}")
-    public ResponseEntity<HttpStatus> deleteMetadata(@PathVariable("fileName") String fileName, @RequestParam("uuid") String id) {
+    public ResponseEntity<HttpStatus> deleteMetadata(@PathVariable("fileName") String fileName, @Valid @NotBlank @RequestParam("uuid") String id) {
         try {
             Optional<File> metadatum = fileRepository.findByFileNameAndTaskId(fileName, id);
 
