@@ -1,4 +1,4 @@
-package org.dmc.vottdotserver.model;
+package org.dmc.vottdotserver.models.domain;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import org.hibernate.annotations.Type;

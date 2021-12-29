@@ -1,15 +1,17 @@
-package org.dmc.vottdotserver.controller;
+package org.dmc.vottdotserver.controllers;
 
-import org.dmc.vottdotserver.model.Task;
+import org.dmc.vottdotserver.components.DomainDtoMapper;
+import org.dmc.vottdotserver.exceptions.DataNotFoundException;
+import org.dmc.vottdotserver.models.domain.Task;
+import org.dmc.vottdotserver.models.dto.TaskDto;
 import org.dmc.vottdotserver.repository.TaskRepository;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,12 +22,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
+//@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
 @RestController
 @RequestMapping("/task")
 public class TaskController {
     @Autowired
     TaskRepository taskRepository;
+
+    @Autowired
+    DomainDtoMapper<Task, TaskDto> taskDomainToDtoMapper;
 
     @GetMapping("")
     public ResponseEntity<List<Task>> getAllTasks() {
@@ -44,6 +49,15 @@ public class TaskController {
         }
     }
 
+    @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<TaskDto> getTask(@RequestParam("uuid") String id) {
+        final Task result = taskRepository.findById(id).stream().findFirst()
+                .orElseThrow(() -> new DataNotFoundException("No instance found for the provided ID", null));
+        return ResponseEntity.ok()
+                .body(this.taskDomainToDtoMapper.convertTo(result, TaskDto.class));
+    }
+
+    /*
     @RequestMapping(value = "", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<String> getTaskById(@RequestParam("uuid") String id) {
         Optional<Task> metadatum = taskRepository.findById(id);
@@ -53,20 +67,19 @@ public class TaskController {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-    }
+    }*/
 
     @RequestMapping(value = "", method = RequestMethod.POST, produces = "application/json")
     public ResponseEntity<Task> createTask(@RequestBody String TaskBody) {
         try {
             final JSONObject obj = new JSONObject(TaskBody);
-            final String metadatumId = obj.getString("token");
-            final String owner = obj.getString("owner");
-            if (metadatumId.length() == 0 || owner.length() == 0) {
+            final String metadatumId = obj.getString("id");
+            if (metadatumId.length() == 0) {
                 return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
             }
             try {
                 Task _metadatum = taskRepository
-                        .save(new Task(metadatumId, TaskBody));
+                        .save(new Task(obj));
                 return new ResponseEntity<>(_metadatum, HttpStatus.CREATED);
             } catch (Exception e) {
                 return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -79,6 +92,7 @@ public class TaskController {
     @RequestMapping(value = "", method = RequestMethod.PUT, produces = "application/json")
     public ResponseEntity<String> updateTask(@RequestParam("uuid") String id, @RequestBody String TaskBody) {
         Optional<Task> metadatum = taskRepository.findById(id);
+        final JSONObject obj = new JSONObject(TaskBody);
 
         if (TaskBody.isEmpty()) {
             return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
@@ -88,7 +102,7 @@ public class TaskController {
             _metadatum.setData(TaskBody);
             return new ResponseEntity<>(taskRepository.save(_metadatum).getData(), HttpStatus.ACCEPTED);
         } else {
-            return new ResponseEntity<>(taskRepository.save(new Task(id, TaskBody)).getData(), HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(taskRepository.save(new Task(obj)).getData(), HttpStatus.ACCEPTED);
         }
     }
 

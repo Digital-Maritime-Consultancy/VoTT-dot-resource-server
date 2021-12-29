@@ -1,4 +1,4 @@
-package org.dmc.vottdotserver.model;
+package org.dmc.vottdotserver.models.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,10 +1,9 @@
 package org.dmc.vottdotserver.repository;
 
-import org.dmc.vottdotserver.model.Task;
+import org.dmc.vottdotserver.models.domain.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
