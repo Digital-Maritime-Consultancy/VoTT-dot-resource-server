@@ -14,15 +14,18 @@ import java.util.UUID;
         @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 })
 public class Resource {
-    public UUID getUuid() {
-        return uuid;
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     @Id
     @Type(type = "pg-uuid")
-    private UUID uuid;
+    protected UUID id;
 
     public Resource() {
-        this.uuid = UUID.randomUUID();
     }
 }

@@ -84,7 +84,7 @@ public class FileController {
 
             if (metadatum.isPresent()) {
                 File _metadatum = metadatum.get();
-                fileRepository.deleteById(_metadatum.getUuid());
+                fileRepository.deleteById(_metadatum.getId());
             }
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 

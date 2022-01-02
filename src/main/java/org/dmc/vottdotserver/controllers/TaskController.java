@@ -4,8 +4,7 @@ import org.dmc.vottdotserver.components.DomainDtoMapper;
 import org.dmc.vottdotserver.exceptions.DataNotFoundException;
 import org.dmc.vottdotserver.models.domain.Task;
 import org.dmc.vottdotserver.models.dto.TaskDto;
-import org.dmc.vottdotserver.repository.TaskRepository;
-import org.json.JSONObject;
+import org.dmc.vottdotserver.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,110 +17,80 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
+import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 //@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
 @RestController
 @RequestMapping("/task")
 public class TaskController {
-    @Autowired
-    TaskRepository taskRepository;
 
     @Autowired
+    TaskService taskService;
+
+    /**
+     * Object Mapper from Domain to DTO.
+     */
+    @Autowired
     DomainDtoMapper<Task, TaskDto> taskDomainToDtoMapper;
+
+    /**
+     * Object Mapper from DTO to Domain.
+     */
+    @Autowired
+    DomainDtoMapper<TaskDto, Task> taskDtoToDomainMapper;
 
     @GetMapping("")
     public ResponseEntity<List<Task>> getAllTasks() {
         try {
-            List<Task> Task = new ArrayList<Task>();
+            List<Task> tasks = this.taskService.findAll();
 
-            taskRepository.findAll().forEach(Task::add);
-
-            if (Task.isEmpty()) {
+            if (tasks.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
 
-            return new ResponseEntity<>(Task, HttpStatus.OK);
+            return new ResponseEntity<>(tasks, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<TaskDto> getTask(@RequestParam("uuid") String id) {
-        final Task result = taskRepository.findById(id).stream().findFirst()
-                .orElseThrow(() -> new DataNotFoundException("No instance found for the provided ID", null));
+    public ResponseEntity<TaskDto> getTask(@RequestParam("uuid") String id) throws DataNotFoundException{
         return ResponseEntity.ok()
-                .body(this.taskDomainToDtoMapper.convertTo(result, TaskDto.class));
-    }
-
-    /*
-    @RequestMapping(value = "", method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<String> getTaskById(@RequestParam("uuid") String id) {
-        Optional<Task> metadatum = taskRepository.findById(id);
-
-        if (metadatum.isPresent()) {
-            return new ResponseEntity<>(metadatum.get().getData(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }*/
-
-    @RequestMapping(value = "", method = RequestMethod.POST, produces = "application/json")
-    public ResponseEntity<Task> createTask(@RequestBody String TaskBody) {
-        try {
-            final JSONObject obj = new JSONObject(TaskBody);
-            final String metadatumId = obj.getString("id");
-            if (metadatumId.length() == 0) {
-                return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
-            }
-            try {
-                Task _metadatum = taskRepository
-                        .save(new Task(obj));
-                return new ResponseEntity<>(_metadatum, HttpStatus.CREATED);
-            } catch (Exception e) {
-                return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
-        }
+                .body(this.taskDomainToDtoMapper.convertTo(this.taskService.findOne(UUID.fromString(id)), TaskDto.class));
     }
 
     @RequestMapping(value = "", method = RequestMethod.PUT, produces = "application/json")
-    public ResponseEntity<String> updateTask(@RequestParam("uuid") String id, @RequestBody String TaskBody) {
-        Optional<Task> metadatum = taskRepository.findById(id);
-        final JSONObject obj = new JSONObject(TaskBody);
-
-        if (TaskBody.isEmpty()) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
-        }
-        if (metadatum.isPresent()) {
-            Task _metadatum = metadatum.get();
-            _metadatum.setData(TaskBody);
-            return new ResponseEntity<>(taskRepository.save(_metadatum).getData(), HttpStatus.ACCEPTED);
-        } else {
-            return new ResponseEntity<>(taskRepository.save(new Task(obj)).getData(), HttpStatus.ACCEPTED);
-        }
+    public ResponseEntity<TaskDto> updateTask(@RequestParam("uuid") String id, @Valid @RequestBody TaskDto taskDto) throws DataNotFoundException{
+        return saveTask(UUID.fromString(id), this.taskDtoToDomainMapper.convertTo(taskDto, Task.class), !this.taskService.doesExist(UUID.fromString(id)));
     }
 
     @DeleteMapping("")
-    public ResponseEntity<HttpStatus> deleteTask(@RequestParam("uuid") String id) {
+    public ResponseEntity<String> deleteTask(@RequestParam("uuid") String id){
         try {
-            Optional<Task> metadatum = taskRepository.findById(id);
-
-            if (metadatum.isPresent()) {
-                Task _metadatum = metadatum.get();
-                taskRepository.deleteById(_metadatum.getUuid());
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-            else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            this.taskService.delete(UUID.fromString(id));
         }
+        catch (Exception e)
+        {
+            return ResponseEntity.notFound()
+                    .build();
+        }
+        return ResponseEntity.noContent().build();
+    }
+
+    private ResponseEntity<TaskDto> saveTask(UUID id, Task task, boolean newInstance) {
+        try {
+            task.setId(id);
+            task = this.taskService.save(task);
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest()
+                    .body(this.taskDomainToDtoMapper.convertTo(task, TaskDto.class));
+        }
+
+        return newInstance ?
+                new ResponseEntity<>(this.taskDomainToDtoMapper.convertTo(task, TaskDto.class), HttpStatus.CREATED) :
+                new ResponseEntity<>(this.taskDomainToDtoMapper.convertTo(task, TaskDto.class), HttpStatus.ACCEPTED);
     }
 }

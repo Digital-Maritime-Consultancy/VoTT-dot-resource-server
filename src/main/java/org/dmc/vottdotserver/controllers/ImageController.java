@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import javax.servlet.http.HttpServletResponse;
 
-import org.dmc.vottdotserver.repository.TaskRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -23,9 +21,6 @@ public class ImageController {
 
     @Value("classpath:jsons/data.json")
     Resource resourceFile;
-
-    @Autowired
-    TaskRepository taskRepository;
 
     @RequestMapping(value = "", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
