@@ -21,6 +21,15 @@ public class TaskDto implements Serializable, JsonSerializable {
     private Map<String, String> image_list;
     private String createdAt;
     private String lastUpdatedAt;
+    private Map<String, String> progress;
+
+    public Map<String, String> getProgress() {
+        return progress;
+    }
+
+    public void setProgress(Map<String, String> progress) {
+        this.progress = progress;
+    }
 
     public String getCreatedAt() {
         return createdAt;

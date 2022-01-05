@@ -64,7 +64,7 @@ public class TaskController {
 
     @RequestMapping(value = "", method = RequestMethod.PUT, produces = "application/json")
     public ResponseEntity<TaskDto> updateTask(@RequestParam("uuid") String id, @Valid @RequestBody TaskDto taskDto) throws DataNotFoundException{
-        return saveTask(UUID.fromString(id), this.taskDtoToDomainMapper.convertTo(taskDto, Task.class), !this.taskService.doesExist(UUID.fromString(id)));
+        return saveTask(UUID.fromString(id), this.taskDtoToDomainMapper.convertTo(taskDto, Task.class));
     }
 
     @DeleteMapping("")
@@ -80,7 +80,9 @@ public class TaskController {
         return ResponseEntity.noContent().build();
     }
 
-    private ResponseEntity<TaskDto> saveTask(UUID id, Task task, boolean newInstance) {
+    private ResponseEntity<TaskDto> saveTask(UUID id, Task task) {
+        boolean newTask = !this.taskService.doesExist(id);
+
         try {
             task.setId(id);
             task = this.taskService.save(task);
@@ -89,7 +91,7 @@ public class TaskController {
                     .body(this.taskDomainToDtoMapper.convertTo(task, TaskDto.class));
         }
 
-        return newInstance ?
+        return newTask ?
                 new ResponseEntity<>(this.taskDomainToDtoMapper.convertTo(task, TaskDto.class), HttpStatus.CREATED) :
                 new ResponseEntity<>(this.taskDomainToDtoMapper.convertTo(task, TaskDto.class), HttpStatus.ACCEPTED);
     }
