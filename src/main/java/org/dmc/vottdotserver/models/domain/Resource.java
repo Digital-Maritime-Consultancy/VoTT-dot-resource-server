@@ -1,4 +1,4 @@
-package org.dmc.vottdotserver.model;
+package org.dmc.vottdotserver.models.domain;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import org.hibernate.annotations.Type;
@@ -14,15 +14,11 @@ import java.util.UUID;
         @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 })
 public class Resource {
-    public UUID getUuid() {
-        return uuid;
-    }
 
     @Id
     @Type(type = "pg-uuid")
-    private UUID uuid;
+    protected UUID id;
 
     public Resource() {
-        this.uuid = UUID.randomUUID();
     }
 }
