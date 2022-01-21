@@ -73,7 +73,7 @@ public class FileController {
         else {
             if (fileName.contains(".vott")) {
                 isEnabled = true;
-            } else {
+            } else if (fileName.contains(".json")) {
                 try {
                     JSONObject obj = new JSONObject(jsonBody);
                     isEnabled = obj.getBoolean("isEnabled");
