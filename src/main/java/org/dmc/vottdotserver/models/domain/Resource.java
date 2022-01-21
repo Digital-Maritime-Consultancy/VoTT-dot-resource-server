@@ -20,8 +20,10 @@ import java.util.UUID;
 public class Resource {
 
     @Id
+    @Type(type = "pg-uuid")
     protected UUID id;
 
     public Resource() {
+        this.id = UUID.randomUUID();
     }
 }

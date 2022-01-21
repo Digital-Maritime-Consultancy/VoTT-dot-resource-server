@@ -2,6 +2,7 @@ package org.dmc.vottdotserver.controllers;
 
 import org.dmc.vottdotserver.models.domain.File;
 import org.dmc.vottdotserver.repository.FileRepository;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,16 +65,29 @@ public class FileController {
     @RequestMapping(value = "/{fileName}", method = RequestMethod.PUT, produces = "application/json")
     public ResponseEntity<String> updateMetadata(@PathVariable("fileName") String fileName, @Valid @NotBlank @RequestParam("uuid") String id, @RequestBody String jsonBody) {
         Optional<File> metadatum = fileRepository.findByFileName(getFileId(fileName, id));
+        boolean isEnabled = false;
 
         if (jsonBody.isEmpty()) {
             return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
+        }
+        else {
+            if (fileName.contains(".vott")) {
+                isEnabled = true;
+            } else if (fileName.contains(".json")) {
+                try {
+                    JSONObject obj = new JSONObject(jsonBody);
+                    isEnabled = obj.getBoolean("isEnabled");
+                } catch (Exception e) {
+                    System.out.println("Error in parsing json");
+                }
+            }
         }
         if (metadatum.isPresent()) {
             File _metadatum = metadatum.get();
             _metadatum.setData(jsonBody);
             return new ResponseEntity<>(fileRepository.save(_metadatum).getData(), HttpStatus.ACCEPTED);
         } else {
-            return new ResponseEntity<>(fileRepository.save(new File(getFileId(fileName, id), jsonBody)).getData(), HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(fileRepository.save(new File(getFileId(fileName, id), isEnabled, jsonBody)).getData(), HttpStatus.ACCEPTED);
         }
     }
 

@@ -18,6 +18,8 @@ public class File extends Resource{
 
     private String fileName;
 
+    private Boolean isDisabled;
+
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")
     @Basic(fetch = FetchType.LAZY)
