@@ -18,7 +18,7 @@ public class File extends Resource{
 
     private String fileName;
 
-    private boolean isEnabled;
+    private Boolean isDisabled;
 
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")
