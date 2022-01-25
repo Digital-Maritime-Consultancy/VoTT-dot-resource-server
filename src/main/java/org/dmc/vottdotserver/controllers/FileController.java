@@ -1,8 +1,8 @@
 package org.dmc.vottdotserver.controllers;
 
+import org.dmc.vottdotserver.exceptions.DataNotFoundException;
 import org.dmc.vottdotserver.models.domain.File;
-import org.dmc.vottdotserver.repository.FileRepository;
-import org.json.JSONObject;
+import org.dmc.vottdotserver.services.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,14 +13,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 
-import java.util.ArrayList;
+import javax.naming.ServiceUnavailableException;
 import java.util.List;
-import java.util.Optional;
 
 //@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
 @RestController
@@ -28,80 +24,45 @@ import java.util.Optional;
 @RequestMapping("/file")
 public class FileController {
     @Autowired
-    FileRepository fileRepository;
+    FileService fileService;
 
     @GetMapping("")
     public ResponseEntity<List<File>> getAllMetadatas() {
         try {
-            List<File> metadata = new ArrayList<File>();
+            List<File> files = this.fileService.findAll();
 
-            fileRepository.findAll().forEach(metadata::add);
-
-            if (metadata.isEmpty()) {
+            if (files.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
 
-            return new ResponseEntity<>(metadata, HttpStatus.OK);
+            return new ResponseEntity<>(files, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    private String getFileId(String fileName, String id) {
-        return fileName + "_" + id;
-    }
-
     @RequestMapping(value = "/{fileName}", method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<String> getMetadataById(@PathVariable("fileName") String fileName, @Valid @NotBlank @RequestParam("uuid") String id) {
-        Optional<File> metadatum = fileRepository.findByFileName(getFileId(fileName, id));
-
-        if (metadatum.isPresent()) {
-            return new ResponseEntity<>(metadatum.get().getData(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("", HttpStatus.NO_CONTENT);
+    public ResponseEntity<String> getMetadataById(@PathVariable("fileName") String fileName) {
+        try {
+            File file = this.fileService.findOne(fileName);
+            return new ResponseEntity<>(file.getData(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 
     @RequestMapping(value = "/{fileName}", method = RequestMethod.PUT, produces = "application/json")
-    public ResponseEntity<String> updateMetadata(@PathVariable("fileName") String fileName, @Valid @NotBlank @RequestParam("uuid") String id, @RequestBody String jsonBody) {
-        Optional<File> metadatum = fileRepository.findByFileName(getFileId(fileName, id));
-        boolean isEnabled = false;
-
-        if (jsonBody.isEmpty()) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
-        }
-        else {
-            if (fileName.contains(".vott")) {
-                isEnabled = true;
-            } else if (fileName.contains(".json")) {
-                try {
-                    JSONObject obj = new JSONObject(jsonBody);
-                    isEnabled = obj.getBoolean("isEnabled");
-                } catch (Exception e) {
-                    System.out.println("Error in parsing json");
-                }
-            }
-        }
-        if (metadatum.isPresent()) {
-            File _metadatum = metadatum.get();
-            _metadatum.setData(jsonBody);
-            return new ResponseEntity<>(fileRepository.save(_metadatum).getData(), HttpStatus.ACCEPTED);
-        } else {
-            return new ResponseEntity<>(fileRepository.save(new File(getFileId(fileName, id), isEnabled, jsonBody)).getData(), HttpStatus.ACCEPTED);
-        }
+    public ResponseEntity<String> updateMetadata(@PathVariable("fileName") String fileName, @RequestBody String jsonBody) throws ServiceUnavailableException {
+        return new ResponseEntity<>(this.fileService.save(fileName, jsonBody).getData(), HttpStatus.ACCEPTED);
     }
 
     @DeleteMapping("/{fileName}")
-    public ResponseEntity<HttpStatus> deleteMetadata(@PathVariable("fileName") String fileName, @Valid @NotBlank @RequestParam("uuid") String id) {
+    public ResponseEntity<HttpStatus> deleteMetadata(@PathVariable("fileName") String fileName) {
         try {
-            Optional<File> metadatum = fileRepository.findByFileName(getFileId(fileName, id));
-
-            if (metadatum.isPresent()) {
-                File _metadatum = metadatum.get();
-                fileRepository.deleteById(_metadatum.getId());
-            }
+            this.fileService.delete(fileName);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-
+        } catch (DataNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
