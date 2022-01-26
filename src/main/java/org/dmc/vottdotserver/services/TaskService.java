@@ -5,13 +5,10 @@ import org.dmc.vottdotserver.exceptions.DataNotFoundException;
 import org.dmc.vottdotserver.models.domain.Task;
 import org.dmc.vottdotserver.models.domain.enums.AssetState;
 import org.dmc.vottdotserver.repository.TaskRepository;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -62,7 +59,7 @@ public class TaskService {
      * @return the persisted entity
      */
     @Transactional
-    public Task save(Task task) throws DataNotFoundException {
+    public Task save(Task task) throws DataNotFoundException, MissingFormatArgumentException {
         log.debug("Request to save Task : {}", task);
 
         this.taskRepository.findById(task.getId()).ifPresentOrElse(taskInDB -> {
@@ -76,12 +73,12 @@ public class TaskService {
         this.validateTaskForSave(task);
 
         if(task.getProgress()==null) {
-            if(task.getImage_list() == null || task.getImage_list().isEmpty()){
+            if(task.getImageList() == null || task.getImageList().isEmpty()){
                 task.setProgress(new HashMap<>());
             }
             else{
                 Map<String, AssetState> progress = new HashMap<>();
-                Iterator<Map.Entry<String, String>> iterator = task.getImage_list().entrySet().iterator();
+                Iterator<Map.Entry<String, String>> iterator = task.getImageList().entrySet().iterator();
                 while (iterator.hasNext()) {
                     Map.Entry<String, String> entry = iterator.next();
                     progress.put(entry.getKey(), AssetState.NOTVISITED);
@@ -123,6 +120,18 @@ public class TaskService {
 
         if(task.getId() == null){
             throw new MissingFormatArgumentException("No ID found");
+        }
+        if(task.getStellaUrl() == null){
+            throw new MissingFormatArgumentException("No Stella URL found");
+        }
+        if(task.getVottBackendUrl() == null){
+            throw new MissingFormatArgumentException("No VoTT backend url found");
+        }
+        if(task.getImageServerUrl() == null){
+            throw new MissingFormatArgumentException("No image server url found");
+        }
+        if(task.getTaskServerUrl() == null){
+            throw new MissingFormatArgumentException("No task server url found");
         }
     }
 

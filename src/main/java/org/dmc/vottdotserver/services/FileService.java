@@ -72,7 +72,7 @@ public class FileService {
         }
         else {
             if (fileName.contains(".vott")) {
-                isDisabled = true;
+                isDisabled = false;
             } else if (fileName.contains(".json")) {
                 try {
                     JSONObject obj = new JSONObject(jsonBody);
