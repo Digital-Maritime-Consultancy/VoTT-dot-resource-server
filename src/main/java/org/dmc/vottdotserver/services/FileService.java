@@ -78,7 +78,7 @@ public class FileService {
                     JSONObject obj = new JSONObject(jsonBody);
                     isDisabled = obj.getBoolean("isDisabled");
                 } catch (Exception e) {
-                    System.out.println("Error in parsing json");
+                    System.out.println("Error in parsing json: \n" +jsonBody);
                 }
             }
         }

@@ -147,6 +147,24 @@ public class TaskController {
         videoSettings.put("frameExtractionRate", 15);
         obj.put("videoSettings", videoSettings);
 
+        if (task.getType().equals("Cleansing")){
+            if (task.getStatus().equals("In_progress")){
+                obj.put("taskType", "purification");
+            } else if (task.getStatus().equals("Review")){
+                obj.put("taskType", "revise-purification");
+            }
+        } else if (task.getType().equals("Annotation")){
+            if (task.getStatus().equals("In_progress")){
+                obj.put("taskType", "annotation");
+            } else if (task.getStatus().equals("Review")){
+                obj.put("taskType", "revise-annotation");
+            }
+        } else if (task.getType().equals("Evaluation")){
+            obj.put("taskType", "audit");
+        } else {
+            obj.put("taskType", "notassigned");
+        }
+
         JSONArray arrayElementArray = new JSONArray();
         for (Map.Entry<String, String> entry : task.getClassList().entrySet()) {
             JSONObject arrayElementOne = new JSONObject();
