@@ -65,20 +65,21 @@ public class FileService {
     public File save(String fileName, String jsonBody) throws ServiceUnavailableException {
         log.debug("Request to save file : {}", fileName);
         Optional<File> metadatum = fileRepository.findByFileName(fileName);
-        boolean isDisabled = true;
+        boolean isDisabled = false;
 
         if (jsonBody.isEmpty()) {
             throw new ServiceUnavailableException("No JSON body");
         }
         else {
-            if (fileName.contains(".vott")) {
-                isDisabled = false;
-            } else if (fileName.contains(".json")) {
+            if (fileName.contains(".json")) {
+                JSONObject obj = null;
                 try {
-                    JSONObject obj = new JSONObject(jsonBody);
-                    isDisabled = obj.getBoolean("isDisabled");
+                    obj = new JSONObject(jsonBody);
                 } catch (Exception e) {
                     System.out.println("Error in parsing json: \n" +jsonBody);
+                }
+                if (obj != null && obj.getJSONObject("asset") != null) {
+                    isDisabled = obj.getJSONObject("asset").getBoolean("isDisabled");
                 }
             }
         }
