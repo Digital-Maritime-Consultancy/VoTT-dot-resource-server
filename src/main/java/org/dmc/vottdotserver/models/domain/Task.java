@@ -28,6 +28,7 @@ public class Task extends Resource {
     @NotNull
     @NotBlank
     private String taskServerUrl;
+    private String dotToRectUrl;
     private String description;
     @Type( type = "json" )
     private Map<String, String> classList = new HashMap<>();

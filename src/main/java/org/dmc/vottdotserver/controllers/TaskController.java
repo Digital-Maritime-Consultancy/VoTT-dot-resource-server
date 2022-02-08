@@ -147,6 +147,9 @@ public class TaskController {
         videoSettings.put("frameExtractionRate", 15);
         obj.put("videoSettings", videoSettings);
 
+        dotToRectSettings.put("url", task.getDotToRectUrl());
+        obj.put("dotToRectSettings", dotToRectSettings);
+
         if (task.getType().equals("Cleansing")){
             if (task.getStatus().equals("In_progress")){
                 obj.put("taskType", "purification");

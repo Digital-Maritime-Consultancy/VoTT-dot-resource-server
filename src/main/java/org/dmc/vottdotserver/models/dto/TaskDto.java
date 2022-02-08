@@ -35,4 +35,5 @@ public class TaskDto implements Serializable, JsonSerializable {
     private String imageServerUrl;
     @NotNull
     private String taskServerUrl;
+    private String dotToRectUrl;
 }
