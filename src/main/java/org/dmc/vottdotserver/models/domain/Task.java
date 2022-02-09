@@ -44,10 +44,12 @@ public class Task extends Resource {
     private String status;
     private String createdAt;
     private String lastUpdatedAt;
+    private String lastUsedForProjectCreation;
 
     public Task() {
         this.setCreatedAt("");
         this.setLastUpdatedAt("");
+        this.setLastUsedForProjectCreation("");
     }
 
     public void update(Task original) {

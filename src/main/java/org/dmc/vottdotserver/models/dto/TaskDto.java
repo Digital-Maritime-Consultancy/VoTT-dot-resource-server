@@ -28,6 +28,7 @@ public class TaskDto implements Serializable, JsonSerializable {
     private Map<String, String> imageList;
     private String createdAt;
     private String lastUpdatedAt;
+    private String lastUsedForProjectCreation;
     private Map<String, String> progress;
     @NotNull
     private String vottBackendUrl;

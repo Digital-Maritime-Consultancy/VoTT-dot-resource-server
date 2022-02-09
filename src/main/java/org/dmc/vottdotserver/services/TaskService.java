@@ -68,6 +68,7 @@ public class TaskService {
         }, () -> {
             task.setCreatedAt(this.getCurrentUTCTimeISO8601());
             task.setLastUpdatedAt(task.getCreatedAt());
+            task.setLastUsedForProjectCreation("");
         });
 
         this.validateTaskForSave(task);
@@ -106,7 +107,7 @@ public class TaskService {
                 });
     }
 
-    private String getCurrentUTCTimeISO8601() {
+    public String getCurrentUTCTimeISO8601() {
         TimeZone tz = TimeZone.getTimeZone("UTC");
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         df.setTimeZone(tz);
