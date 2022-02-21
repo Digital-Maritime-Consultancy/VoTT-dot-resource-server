@@ -96,7 +96,7 @@ public class TaskController {
         }
     }
 
-    @RequestMapping(value = "/newProject", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/create", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<String> createNewProject(@RequestParam("uuid") String id) {
         Task task;
         try {
