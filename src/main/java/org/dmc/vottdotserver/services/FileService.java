@@ -3,25 +3,16 @@ package org.dmc.vottdotserver.services;
 import lombok.extern.slf4j.Slf4j;
 import org.dmc.vottdotserver.exceptions.DataNotFoundException;
 import org.dmc.vottdotserver.models.domain.File;
-import org.dmc.vottdotserver.models.domain.Task;
-import org.dmc.vottdotserver.models.domain.enums.AssetState;
 import org.dmc.vottdotserver.repository.FileRepository;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.naming.ServiceUnavailableException;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.MissingFormatArgumentException;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @Slf4j
