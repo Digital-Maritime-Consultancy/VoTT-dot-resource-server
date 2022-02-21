@@ -65,6 +65,9 @@ public class TaskService {
         this.taskRepository.findById(task.getId()).ifPresentOrElse(taskInDB -> {
             task.update(taskInDB);
             task.setLastUpdatedAt(this.getCurrentUTCTimeISO8601());
+            if (task.getLastUsedForProjectCreation() == null){
+                task.setLastUsedForProjectCreation("");
+            }
         }, () -> {
             task.setCreatedAt(this.getCurrentUTCTimeISO8601());
             task.setLastUpdatedAt(task.getCreatedAt());
