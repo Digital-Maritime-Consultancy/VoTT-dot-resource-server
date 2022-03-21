@@ -1,6 +1,8 @@
-package org.dmc.vottdotserver.model;
+package org.dmc.vottdotserver.models.domain;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
@@ -13,16 +15,15 @@ import java.util.UUID;
 @TypeDefs({
         @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 })
+@Getter
+@Setter
 public class Resource {
-    public UUID getUuid() {
-        return uuid;
-    }
 
     @Id
     @Type(type = "pg-uuid")
-    private UUID uuid;
+    protected UUID id;
 
     public Resource() {
-        this.uuid = UUID.randomUUID();
+        this.id = UUID.randomUUID();
     }
 }

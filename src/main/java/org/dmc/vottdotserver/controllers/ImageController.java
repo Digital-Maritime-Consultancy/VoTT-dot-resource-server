@@ -1,4 +1,4 @@
-package org.dmc.vottdotserver.controller;
+package org.dmc.vottdotserver.controllers;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,24 +14,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+//@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
 @RestController
-@RequestMapping("/images")
+@RequestMapping("/image")
 public class ImageController {
 
     @Value("classpath:jsons/data.json")
     Resource resourceFile;
 
-    @RequestMapping(value = "/{name}", method = RequestMethod.GET,
+    @RequestMapping(value = "", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getImages(HttpServletResponse response, @PathVariable("name") String name) throws IOException {
-        String actual = Files.readString(resourceFile.getFile().toPath());
-        return actual;
+    public String getAllImages() throws IOException {
+        return Files.readString(resourceFile.getFile().toPath());
     }
 
-    @RequestMapping(value = "/{name}/{fileName}", method = RequestMethod.GET,
+    @RequestMapping(value = "/{fileName}", method = RequestMethod.GET,
             produces = MediaType.IMAGE_JPEG_VALUE)
-
-    public void getImage(HttpServletResponse response, @PathVariable("name") String name, @PathVariable("fileName") String fileName) throws IOException {
+    public void getImage(HttpServletResponse response, @PathVariable("fileName") String fileName) throws IOException {
 
         var imgFile = new ClassPathResource("images/"+fileName);
 

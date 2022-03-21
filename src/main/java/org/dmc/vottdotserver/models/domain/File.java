@@ -1,4 +1,4 @@
-package org.dmc.vottdotserver.model;
+package org.dmc.vottdotserver.models.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,25 +14,11 @@ import javax.persistence.FetchType;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Json extends Resource{
-
-    public String getData() {
-        return data;
-    }
-
-    public void setData(String data) {
-        this.data = data;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
+public class File extends Resource{
 
     private String fileName;
+
+    private Boolean isDisabled;
 
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")
