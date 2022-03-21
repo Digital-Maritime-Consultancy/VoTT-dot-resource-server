@@ -1,13 +1,9 @@
 package org.dmc.vottdotserver.components;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.modelmapper.ModelMapper;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class DomainDtoMapper <F, T> {

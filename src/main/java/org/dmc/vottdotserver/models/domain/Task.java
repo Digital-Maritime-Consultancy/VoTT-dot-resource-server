@@ -5,17 +5,12 @@ import lombok.Data;
 import org.dmc.vottdotserver.models.domain.enums.AssetState;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
-import org.json.JSONObject;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @Entity
 @Data
@@ -23,12 +18,22 @@ import java.util.UUID;
 public class Task extends Resource {
     @NotNull
     @NotBlank
-    private String stella_url;
+    private String stellaUrl;
+    @NotNull
+    @NotBlank
+    private String vottBackendUrl;
+    @NotNull
+    @NotBlank
+    private String imageServerUrl;
+    @NotNull
+    @NotBlank
+    private String taskServerUrl;
+    private String dotToRectUrl;
     private String description;
     @Type( type = "json" )
-    private Map<String, String> class_list = new HashMap<>();
+    private Map<String, String> classList = new HashMap<>();
     @Type( type = "json" )
-    private Map<String, String> image_list = new HashMap<>();
+    private Map<String, String> imageList = new HashMap<>();
     @Type( type = "json" )
     private Map<String, AssetState> progress = new HashMap<>();
     @NotNull
@@ -39,10 +44,12 @@ public class Task extends Resource {
     private String status;
     private String createdAt;
     private String lastUpdatedAt;
+    private String lastUsedForProjectCreation;
 
     public Task() {
         this.setCreatedAt("");
         this.setLastUpdatedAt("");
+        this.setLastUsedForProjectCreation("");
     }
 
     public void update(Task original) {
@@ -50,11 +57,11 @@ public class Task extends Resource {
         if (this.getProgress() == null){
             this.setProgress(original.getProgress());
         }
-        if (this.getClass_list() == null){
-            this.setClass_list(original.getClass_list());
+        if (this.getClassList() == null){
+            this.setClassList(original.getClassList());
         }
-        if (this.getImage_list() == null){
-            this.setImage_list(original.getImage_list());
+        if (this.getImageList() == null){
+            this.setImageList(original.getImageList());
         }
     }
 }
