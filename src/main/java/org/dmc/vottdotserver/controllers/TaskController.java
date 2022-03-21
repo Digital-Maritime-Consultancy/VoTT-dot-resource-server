@@ -3,7 +3,9 @@ package org.dmc.vottdotserver.controllers;
 import org.dmc.vottdotserver.components.DomainDtoMapper;
 import org.dmc.vottdotserver.exceptions.DataNotFoundException;
 import org.dmc.vottdotserver.models.domain.Task;
+import org.dmc.vottdotserver.models.domain.vottdot.Project;
 import org.dmc.vottdotserver.models.dto.TaskDto;
+import org.dmc.vottdotserver.services.FileService;
 import org.dmc.vottdotserver.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,6 +31,9 @@ public class TaskController {
     @Autowired
     TaskService taskService;
 
+    @Autowired
+    FileService fileService;
+
     /**
      * Object Mapper from Domain to DTO.
      */
@@ -41,7 +46,7 @@ public class TaskController {
     @Autowired
     DomainDtoMapper<TaskDto, Task> taskDtoToDomainMapper;
 
-    @GetMapping("")
+    @GetMapping(value = "/all")
     public ResponseEntity<List<Task>> getAllTasks() {
         try {
             List<Task> tasks = this.taskService.findAll();
@@ -64,27 +69,10 @@ public class TaskController {
 
     @RequestMapping(value = "", method = RequestMethod.PUT, produces = "application/json")
     public ResponseEntity<TaskDto> updateTask(@RequestParam("uuid") String id, @Valid @RequestBody TaskDto taskDto) throws DataNotFoundException{
-        return saveTask(UUID.fromString(id), this.taskDtoToDomainMapper.convertTo(taskDto, Task.class));
-    }
-
-    @DeleteMapping("")
-    public ResponseEntity<String> deleteTask(@RequestParam("uuid") String id){
+        boolean newTask = !this.taskService.doesExist(UUID.fromString(id));
+        Task task = this.taskDtoToDomainMapper.convertTo(taskDto, Task.class);
         try {
-            this.taskService.delete(UUID.fromString(id));
-        }
-        catch (Exception e)
-        {
-            return ResponseEntity.notFound()
-                    .build();
-        }
-        return ResponseEntity.noContent().build();
-    }
-
-    private ResponseEntity<TaskDto> saveTask(UUID id, Task task) {
-        boolean newTask = !this.taskService.doesExist(id);
-
-        try {
-            task.setId(id);
+            task.setId(UUID.fromString(id));
             task = this.taskService.save(task);
         } catch (Exception ex) {
             return ResponseEntity.badRequest()
@@ -94,5 +82,37 @@ public class TaskController {
         return newTask ?
                 new ResponseEntity<>(this.taskDomainToDtoMapper.convertTo(task, TaskDto.class), HttpStatus.CREATED) :
                 new ResponseEntity<>(this.taskDomainToDtoMapper.convertTo(task, TaskDto.class), HttpStatus.ACCEPTED);
+    }
+
+    @DeleteMapping("")
+    public ResponseEntity<HttpStatus> deleteTask(@RequestParam("uuid") String id){
+        try {
+            this.taskService.delete(UUID.fromString(id));
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @RequestMapping(value = "/create", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<String> createNewProject(@RequestParam("uuid") String id) {
+        Task task;
+        try {
+            task = this.taskService.findOne(UUID.fromString(id));
+        } catch (DataNotFoundException e) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+
+        try {
+            Project project = Project.convert(task);
+            this.fileService.save(id + ".vott", project.toString());
+            task.setLastUsedForProjectCreation(this.taskService.getCurrentUTCTimeISO8601());
+            this.taskService.save(task);
+            return new ResponseEntity<>(project.toString(), HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.SERVICE_UNAVAILABLE);
+        }
     }
 }

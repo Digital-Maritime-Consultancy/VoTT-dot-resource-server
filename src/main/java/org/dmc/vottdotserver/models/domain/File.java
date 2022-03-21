@@ -15,7 +15,7 @@ import javax.persistence.FetchType;
 @AllArgsConstructor
 @NoArgsConstructor
 public class File extends Resource{
-
+    @Column(unique=true)
     private String fileName;
 
     private Boolean isDisabled;
