@@ -23,7 +23,6 @@ public class Project implements Serializable {
     private String description;
     private VideoSetting videoSettings;
     private DotToRectSetting dotToRectSettings;
-    private String taskId;
     private String taskType;
     private String taskStatus;
     private List<Tag> tags;
@@ -82,7 +81,6 @@ public class Project implements Serializable {
         dotToRectSettings.put("url", task.getDotToRectUrl());
         obj.put("dotToRectSettings", dotToRectSettings);
 
-        obj.put("taskId", task.getId());
         obj.put("taskType", task.getType());
         obj.put("taskStatus", task.getStatus());
 
