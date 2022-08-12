@@ -26,6 +26,7 @@ public class Project implements Serializable {
     private String taskType;
     private String taskStatus;
     private List<Tag> tags;
+    private List<AttributeKey> attributeKeys;
     private String version;
     private String useSecurityToken;
     private String securityToken;
@@ -83,6 +84,15 @@ public class Project implements Serializable {
 
         obj.put("taskType", task.getType());
         obj.put("taskStatus", task.getStatus());
+
+        JSONArray attributeKeyArray = new JSONArray();
+        for (Map.Entry<String, String> entry : task.getAttributes().entrySet()) {
+            JSONObject arrayElementOne = new JSONObject();
+            arrayElementOne.put("name", entry.getKey());
+            arrayElementOne.put("description", entry.getValue());
+            attributeKeyArray.put(arrayElementOne);
+        }
+        obj.put("attributeKeys", attributeKeyArray);
 
         JSONArray arrayElementArray = new JSONArray();
         for (Map.Entry<String, String> entry : task.getClassList().entrySet()) {
