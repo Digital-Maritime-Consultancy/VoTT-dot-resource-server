@@ -30,6 +30,7 @@ public class TaskDto implements Serializable, JsonSerializable {
     private String lastUpdatedAt;
     private String lastUsedForProjectCreation;
     private Map<String, String> progress;
+    private Map<String, String> attributeKeys;
     @NotNull
     private String vottBackendUrl;
     @NotNull

@@ -86,7 +86,7 @@ public class Project implements Serializable {
         obj.put("taskStatus", task.getStatus());
 
         JSONArray attributeKeyArray = new JSONArray();
-        for (Map.Entry<String, String> entry : task.getAttributes().entrySet()) {
+        for (Map.Entry<String, String> entry : task.getAttributeKeys().entrySet()) {
             JSONObject arrayElementOne = new JSONObject();
             arrayElementOne.put("name", entry.getKey());
             arrayElementOne.put("description", entry.getValue());

@@ -37,7 +37,7 @@ public class Task extends Resource {
     @Type( type = "json" )
     private Map<String, AssetState> progress = new HashMap<>();
     @Type( type = "json" )
-    private Map<String, String> attributes = new HashMap<>();
+    private Map<String, String> attributeKeys = new HashMap<>();
     @NotNull
     @NotBlank
     private String type;
