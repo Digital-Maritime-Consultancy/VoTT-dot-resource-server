@@ -74,7 +74,9 @@ public class TaskService {
             task.setLastUsedForProjectCreation("");
         });
 
-        this.validateTaskForSave(task);
+        if (task.getAttributeKeys() == null) {
+            task.setAttributeKeys(new HashMap<>());
+        }
 
         if(task.getProgress()==null) {
             if(task.getImageList() == null || task.getImageList().isEmpty()){
@@ -90,6 +92,8 @@ public class TaskService {
                 task.setProgress(progress);
             }
         }
+
+        this.validateTaskForSave(task);
 
         return this.taskRepository.save(task);
     }
